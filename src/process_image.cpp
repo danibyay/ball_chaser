@@ -38,22 +38,21 @@ void move_towards(DBGDirection d)
 // This callback function continuously executes and reads the image data
 void process_image_callback(const sensor_msgs::Image img)
 {
-    int white_pixel = 255;
-    //bool white_seen = false;
+    int all_pixels_are_white = 765;
+    bool white_seen = false;
     DBGDirection d = DBGDirection::stop;
-    float third_width = img.step / 3;
+    float third_width = img.width / 3;
     int third_limit = floor(third_width);
-    for (int i = 0; i < img.height * img.step; i++) {
-      if (img.data[i] == white_pixel) {
-        int xpos = i % img.step;
+    for (int i = 0; i < img.height * img.width; i++) {
+      int sum = img.data[i*3] + img.data[i*3+1] + img.data[i*3+2];
+      if (sum == all_pixels_are_white) {
+        int xpos = i % img.width;
         if (xpos < third_limit) {
           d = DBGDirection::left;
         } else if (xpos >= third_limit && xpos <= third_limit*2) {
           d = DBGDirection::forward;
         } else {
           d = DBGDirection::right;
-          // it should be the same to avoid the middle condition and write
-          // explicitly the right condition. as the initial value is forward.
         }
         break;
       }
